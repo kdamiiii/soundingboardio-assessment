@@ -8,6 +8,8 @@ class CardCreate(CardBase):
 
 class CardOut(CardBase):
     id: int
-    session_id: int
     
     model_config = {"from_attributes": True}
+
+class CardOutWithSession(CardOut):
+    session_id: int

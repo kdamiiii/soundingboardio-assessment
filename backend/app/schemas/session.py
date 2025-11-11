@@ -1,6 +1,7 @@
 from typing import List
 from pydantic import BaseModel
 from app.schemas.card import CardOut
+from app.schemas.transcript import TranscriptOut
 
 class SessionBase(BaseModel):
     mentor_id: int
@@ -19,3 +20,4 @@ class SessionOut(SessionBase):
 
 class SessionDetailsOut(SessionOut):
     cards: List[CardOut] = []
+    transcripts: List[TranscriptOut] = []

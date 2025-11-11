@@ -8,6 +8,8 @@ from app.crud.card import create_card, get_cards_by_sesssion_id
 from app.schemas.auth import TokenData
 from app.schemas.session import SessionDetailsOut, SessionOut, SessionCreate
 from app.schemas.card import CardCreate, CardOut
+from app.schemas.transcript import TranscriptCreate, TranscriptOut
+from app.crud.transcript import create_transcript, get_transcripts_by_sesssion_id
 
 router = APIRouter(prefix="/sessions", tags=["sessions"])
 
@@ -20,7 +22,7 @@ def read_session(session_id: int, db: Session = Depends(get_db)):
     session = get_session_by_id(db, session_id)
     return session
 
-@router.get("/{session_id}/cards", response_model=list[CardOut])
+@router.get("/{session_id}/cards/", response_model=list[CardOut])
 def read_session(session_id: int, db: Session = Depends(get_db)):
     session = get_cards_by_sesssion_id(db, session_id)
     return session
@@ -28,6 +30,16 @@ def read_session(session_id: int, db: Session = Depends(get_db)):
 @router.post("/{session_id}/cards/", response_model=CardOut)
 def post_card_to_session(session_id: int, card_data:CardCreate, db: Session = Depends(get_db)):
     session = create_card(db, session_id, card_data)
+    return session
+
+@router.get("/{session_id}/transcripts/", response_model=list[TranscriptOut])
+def read_session(session_id: int, db: Session = Depends(get_db)):
+    session = get_transcripts_by_sesssion_id(db, session_id)
+    return session
+
+@router.post("/{session_id}/transcripts/", response_model=TranscriptOut)
+def post_card_to_session(session_id: int, card_data:TranscriptCreate, db: Session = Depends(get_db)):
+    session = create_transcript(db, session_id, card_data)
     return session
 
 @router.post("/", response_model=SessionOut)
