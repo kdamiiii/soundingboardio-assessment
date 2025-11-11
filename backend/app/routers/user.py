@@ -1,15 +1,28 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from app.core.database import get_db
-from app.crud.user import get_users, create_user
-from app.schemas import user
+from app.crud.user import get_user_by_id, get_users, create_user, update_user,delete_user
+from app.schemas.user import UserCreate, UserDetailsOut, UserOut, UserUpdate
 
 router = APIRouter(prefix="/users", tags=["users"])
 
-@router.get("/", response_model=list[user.UserOut])
+@router.get("/", response_model=list[UserOut])
 def read_users(db: Session = Depends(get_db)):
     return get_users(db)
 
-@router.post("/", response_model=user.UserOut)
-def post_user(user: user.UserCreate, db: Session = Depends(get_db)):
+@router.get("/{user_id}/", response_model=UserDetailsOut)
+def read_user_by_id(user_id:int, db: Session = Depends(get_db)):
+    return get_user_by_id(db,user_id)
+
+@router.post("/", response_model=UserOut)
+def post_user(user: UserCreate, db: Session = Depends(get_db)):
     return create_user(db, user)
+
+@router.patch("/{user_id}/", response_model=UserOut)
+def patch_user(user_id: int, user: UserUpdate, db: Session = Depends(get_db)):
+    return update_user(db, user_id, user)
+
+@router.delete("/{user_id}/", response_model=dict)
+def del_user(user_id: int, db: Session = Depends(get_db)):
+    delete_user(db, user_id)
+    return {"detail": "User deleted"}

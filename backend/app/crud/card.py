@@ -18,3 +18,13 @@ def create_card(db: Session, session_id:int, card: CardCreate):
     db.refresh(db_card)
 
     return db_card
+
+def get_card_by_id(db: Session, card_id: int):
+    return db.query(Card).filter(Card.id == card_id).first()
+
+def delete_card(db: Session, card_id: int):
+    db_card = db.query(Card).filter(Card.id == card_id).first()
+    if db_card:
+        db.delete(db_card)
+        db.commit()
+    return db_card

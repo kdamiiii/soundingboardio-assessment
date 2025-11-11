@@ -21,3 +21,10 @@ def get_sessions(db: Session, user_id:int = None):
 
 def get_session_by_id(db: Session, session_id: int):
     return db.query(Session).filter(Session.id == session_id).first()
+
+def delete_session(db: Session, session_id: int):
+    db_session = db.query(Session).filter(Session.id == session_id).first()
+    if db_session:
+        db.delete(db_session)
+        db.commit()
+    return db_session
