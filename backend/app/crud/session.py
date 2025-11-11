@@ -1,12 +1,10 @@
 from sqlalchemy.orm import Session
-from app.models import session as session_model
-from app.schemas import session as session_schema
+from app.models.session import Session, Card
+from app.schemas.session import SessionCreate
+from app.schemas.card import CardCreate
 
-def get_sessions(db: Session):
-    return db.query(session_model.Session).all()
-
-def create_session(db: Session, session: session_schema.SessionCreate, user_id: int):
-    db_session = session_model.Session(
+def create_session(db: Session, session: SessionCreate, user_id: int):
+    db_session = Session(
         mentor_id=session.mentor_id,
         user_id=user_id
     )
@@ -14,3 +12,12 @@ def create_session(db: Session, session: session_schema.SessionCreate, user_id: 
     db.commit()
     db.refresh(db_session)
     return db_session
+
+def get_sessions(db: Session, user_id:int = None):
+    print(user_id)
+    if user_id is not None:
+        return db.query(Session).filter(Session.user_id == user_id).all()
+    return db.query(Session).all()
+
+def get_session_by_id(db: Session, session_id: int):
+    return db.query(Session).filter(Session.id == session_id).first()
