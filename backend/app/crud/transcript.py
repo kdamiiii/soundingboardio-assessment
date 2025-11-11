@@ -1,6 +1,7 @@
 from sqlalchemy.orm import Session
 from app.models.session import Transcript
 from app.schemas.transcript import TranscriptCreate
+from app.exceptions import DoesNotExistError
 
 def get_transcripts(db: Session):
     return db.query(Transcript).all()
@@ -22,10 +23,16 @@ def create_transcript(db: Session, session_id:int, transcript: TranscriptCreate)
 
 def delete_transcript(db: Session, transcript_id: int):
     db_transcript = db.query(Transcript).filter(Transcript.id == transcript_id).first()
-    if db_transcript:
-        db.delete(db_transcript)
-        db.commit()
+    if not db_transcript:
+        raise DoesNotExistError("Transcript not found")
+    db.delete(db_transcript)
+    db.commit()
     return db_transcript
 
 def get_transcript_by_id(db: Session, transcript_id: int):
-    return db.query(Transcript).filter(Transcript.id == transcript_id).first()
+    transcript = db.query(Transcript).filter(Transcript.id == transcript_id).first()
+
+    if not transcript:
+        raise DoesNotExistError("Transcript not found")
+    
+    return transcript

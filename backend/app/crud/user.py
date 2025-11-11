@@ -1,6 +1,8 @@
 from sqlalchemy.orm import Session
+from sqlalchemy.exc import IntegrityError
 from app.schemas.user import UserCreate, UserUpdate
 from app.models.user import User
+from app.exceptions import HttpException
 
 def get_users(db: Session):
     return db.query(User).all()
@@ -9,12 +11,18 @@ def get_user_by_id(db: Session, user_id: int):
     return db.query(User).filter(User.id == user_id).first()
 
 def create_user(db: Session, user: UserCreate):
-    db_user = User(**user.model_dump())
-    db.add(db_user)
-    db.commit()
-    db.refresh(db_user)
-    return db_user
-
+    try:
+        db_user = User(**user.model_dump())
+        db.add(db_user)
+        db.commit()
+        db.refresh(db_user)
+        return db_user
+    except IntegrityError:
+        db.rollback()
+        raise HttpException(status_code=400, detail="User with this email already exists")
+    except Exception as e:
+        db.rollback()
+        raise e
 def delete_user(db: Session, user_id: int):
     db_user = db.query(User).filter(User.id == user_id).first()
     if db_user:

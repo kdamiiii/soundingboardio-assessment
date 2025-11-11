@@ -1,19 +1,31 @@
 from sqlalchemy.orm import Session
+from sqlalchemy.exc import IntegrityError
 from app.models.mentor import Mentor
 from app.schemas.mentor import MentorCreate, MentorUpdate
+from app.exceptions import DoesNotExistError, HttpException
 
 def get_mentors(db: Session):
     return db.query(Mentor).all()
 
 def create_mentor(db: Session, mentor: MentorCreate):
-    db_mentor = Mentor(**mentor.model_dump())
-    db.add(db_mentor)
-    db.commit()
-    db.refresh(db_mentor)
-    return db_mentor
-
+    try:
+        db_mentor = Mentor(**mentor.model_dump())
+        db.add(db_mentor)
+        db.commit()
+        db.refresh(db_mentor)
+        return db_mentor
+    except IntegrityError:
+        db.rollback()
+        raise HttpException(status_code=400, detail="Mentor with this name already exists")
+    except Exception as e:
+        db.rollback()
+        raise e
 def get_mentor_by_id(db: Session, mentor_id: int):
-    return db.query(Mentor).filter(Mentor.id == mentor_id).first()
+    mentor_db = db.query(Mentor).filter(Mentor.id == mentor_id).first()
+
+    if not mentor_db:
+        raise DoesNotExistError("Mentor not found")
+    return mentor_db
 
 def update_mentor(db: Session, mentor_id: int, mentor_update: MentorUpdate):
     db_mentor = db.query(Mentor).filter(Mentor.id == mentor_id).first()
@@ -30,7 +42,8 @@ def update_mentor(db: Session, mentor_id: int, mentor_update: MentorUpdate):
 
 def delete_mentor(db: Session, mentor_id: int):
     db_mentor = db.query(Mentor).filter(Mentor.id == mentor_id).first()
-    if db_mentor:
-        db.delete(db_mentor)
-        db.commit()
+    if not db_mentor:
+        raise DoesNotExistError("Mentor not found")
+    db.delete(db_mentor)
+    db.commit()
     return db_mentor
