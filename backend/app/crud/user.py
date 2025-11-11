@@ -77,9 +77,8 @@ def get_user_with_mentors(db: Session, user_id: int):
     )
 
     if not results:
-        return None  # Or raise NotFoundException
-
-    # Build the single-user nested structure
+        return None
+    
     user_data = {
         "id": results[0].user_id,
         "first_name": results[0].first_name,
