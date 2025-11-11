@@ -18,3 +18,13 @@ def create_summary(db: Session, session_id:int, summary: SummaryCreate):
     db.refresh(db_summary)
 
     return db_summary
+
+def get_summary_by_id(db: Session, summary_id: int):
+    return db.query(Summary).filter(Summary.id == summary_id).first()
+
+def delete_summary(db: Session, summary_id: int):
+    db_summary = db.query(Summary).filter(Summary.id == summary_id).first()
+    if db_summary:
+        db.delete(db_summary)
+        db.commit()
+    return db_summary

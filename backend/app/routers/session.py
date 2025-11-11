@@ -9,7 +9,7 @@ from app.schemas.transcript import TranscriptCreate, TranscriptOut
 from app.schemas.action_item import ActionItemCreate, ActionItemOut
 from app.schemas.summary import SummaryCreate, SummaryOut
 from app.dependencies.auth import get_current_user, get_current_user_optional
-from app.crud.session import get_session_by_id, get_sessions, create_session
+from app.crud.session import delete_session, get_session_by_id, get_sessions, create_session
 from app.crud.card import create_card, get_cards_by_sesssion_id
 from app.crud.transcript import create_transcript, get_transcripts_by_sesssion_id
 from app.crud.action_item import create_action_item, get_action_items_by_session_id
@@ -66,7 +66,11 @@ def post_summary_to_session(session_id: int, card_data:SummaryCreate, db: Sessio
     summary = create_summary(db, session_id, card_data)
     return summary
 
-
 @router.post("/", response_model=SessionOut)
 def post_session(session: SessionCreate, db: Session = Depends(get_db), current_user:TokenData = Depends(get_current_user)):    
     return create_session(db, session, current_user.user_id)
+
+@router.delete("/{session_id}/", response_model=dict)
+def del_session(session_id: int, db: Session = Depends(get_db)):
+    delete_session(db, session_id)
+    return {"detail": "Session deleted"}

@@ -27,3 +27,13 @@ def mark_action_item_completed(db: Session, action_item_id: int):
         db.commit()
         db.refresh(action_item)
     return action_item
+
+def get_action_item_by_id(db: Session, action_item_id: int):
+    return db.query(ActionItem).filter(ActionItem.id == action_item_id).first()
+
+def delete_action_item(db: Session, action_item_id: int):
+    db_action_item = db.query(ActionItem).filter(ActionItem.id == action_item_id).first()
+    if db_action_item:
+        db.delete(db_action_item)
+        db.commit()
+    return db_action_item

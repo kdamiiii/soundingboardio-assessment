@@ -19,3 +19,13 @@ def create_transcript(db: Session, session_id:int, transcript: TranscriptCreate)
     db.refresh(db_transcript)
 
     return db_transcript
+
+def delete_transcript(db: Session, transcript_id: int):
+    db_transcript = db.query(Transcript).filter(Transcript.id == transcript_id).first()
+    if db_transcript:
+        db.delete(db_transcript)
+        db.commit()
+    return db_transcript
+
+def get_transcript_by_id(db: Session, transcript_id: int):
+    return db.query(Transcript).filter(Transcript.id == transcript_id).first()

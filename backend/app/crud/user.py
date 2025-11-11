@@ -28,12 +28,11 @@ def update_user(db: Session, user_id: int, user_data: UserUpdate):
         return None
     
     update_data = user_data.model_dump(exclude_unset=True)
-    print("UPDATE DATA", update_data)
-    print("USER ID", user_id)
     for field, value in update_data.items():
         setattr(db_user, field, value)
 
     db.commit()
+    db.refresh(db_user)
     return db_user
 
 def authenticate_user(db: Session, username: str, password: str):
