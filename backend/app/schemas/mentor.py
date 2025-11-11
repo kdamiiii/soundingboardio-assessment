@@ -28,3 +28,6 @@ class MentorUpdate(BaseModel):
     coach_introduction: Optional[str] = None
 
     model_config = {"from_attributes": True}
+
+class MentorWithSessionCountOut(MentorOut):
+    session_count: int
