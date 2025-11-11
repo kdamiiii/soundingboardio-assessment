@@ -1,7 +1,6 @@
 from sqlalchemy.orm import Session
-from app.models.session import Session, Card
+from app.models.session import Session
 from app.schemas.session import SessionCreate
-from app.schemas.card import CardCreate
 from app.exceptions import DoesNotExistError
 
 def create_session(db: Session, session: SessionCreate, user_id: int):
