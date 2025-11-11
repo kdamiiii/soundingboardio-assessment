@@ -1,4 +1,5 @@
 from sqlalchemy import Column, Integer, String
+from sqlalchemy.orm import relationship
 from app.core.database import Base
 
 class Mentor(Base):
@@ -12,3 +13,5 @@ class Mentor(Base):
     about = Column(String, nullable=True)
     photo = Column(String, nullable=True)
     coach_introduction = Column(String, nullable=True)
+    
+    sessions = relationship("Session", back_populates="mentor")
