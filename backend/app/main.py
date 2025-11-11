@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from app.core.database import Base, engine
-from app.routers import user, mentor, session, auth,card,transcript
+from app.routers import user, mentor, session, auth,card,transcript,summary
+from app.routers import action_item
 
 Base.metadata.create_all(bind=engine)
 
@@ -12,3 +13,5 @@ app.include_router(mentor.router)
 app.include_router(session.router)
 app.include_router(card.router)
 app.include_router(transcript.router)
+app.include_router(action_item.router)
+app.include_router(summary.router)
