@@ -2,6 +2,7 @@ from sqlalchemy.orm import Session
 from app.models.session import Session, Card
 from app.schemas.session import SessionCreate
 from app.schemas.card import CardCreate
+from app.exceptions import DoesNotExistError
 
 def create_session(db: Session, session: SessionCreate, user_id: int):
     db_session = Session(
@@ -20,11 +21,17 @@ def get_sessions(db: Session, user_id:int = None):
     return db.query(Session).all()
 
 def get_session_by_id(db: Session, session_id: int):
-    return db.query(Session).filter(Session.id == session_id).first()
+    session_db = db.query(Session).filter(Session.id == session_id).first()
+
+    if not session_db:
+        raise DoesNotExistError("Session not found")
+    return session_db
+
 
 def delete_session(db: Session, session_id: int):
     db_session = db.query(Session).filter(Session.id == session_id).first()
-    if db_session:
-        db.delete(db_session)
-        db.commit()
+    if not db_session:
+        raise DoesNotExistError("Session not found")
+    db.delete(db_session)
+    db.commit()
     return db_session

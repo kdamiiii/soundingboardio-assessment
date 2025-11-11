@@ -1,6 +1,7 @@
 from sqlalchemy.orm import Session
 from app.models.session import ActionItem
 from app.schemas.action_item import ActionItemCreate
+from app.exceptions import DoesNotExistError
 
 def get_action_items(db: Session):
     return db.query(ActionItem).all()
@@ -22,10 +23,11 @@ def create_action_item(db: Session, session_id:int, action_item: ActionItemCreat
 
 def mark_action_item_completed(db: Session, action_item_id: int):
     action_item = db.query(ActionItem).filter(ActionItem.id == action_item_id).first()
-    if action_item:
-        action_item.is_completed = True
-        db.commit()
-        db.refresh(action_item)
+    if not action_item:
+        raise DoesNotExistError("Action Item not found")
+    action_item.is_completed = True
+    db.commit()
+    db.refresh(action_item)
     return action_item
 
 def get_action_item_by_id(db: Session, action_item_id: int):
@@ -33,7 +35,8 @@ def get_action_item_by_id(db: Session, action_item_id: int):
 
 def delete_action_item(db: Session, action_item_id: int):
     db_action_item = db.query(ActionItem).filter(ActionItem.id == action_item_id).first()
-    if db_action_item:
-        db.delete(db_action_item)
-        db.commit()
+    if not db_action_item:
+        raise DoesNotExistError("Action Item not found")
+    db.delete(db_action_item)
+    db.commit()
     return db_action_item

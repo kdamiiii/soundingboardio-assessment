@@ -1,6 +1,7 @@
 from sqlalchemy.orm import Session
 from app.models.session import Card
 from app.schemas.card import CardCreate
+from app.exceptions import DoesNotExistError
 
 def get_cards(db: Session):
     return db.query(Card).all()
@@ -20,11 +21,15 @@ def create_card(db: Session, session_id:int, card: CardCreate):
     return db_card
 
 def get_card_by_id(db: Session, card_id: int):
-    return db.query(Card).filter(Card.id == card_id).first()
+    card = db.query(Card).filter(Card.id == card_id).first()
+    if not card:
+        raise DoesNotExistError("Card not found")
+    return card
 
 def delete_card(db: Session, card_id: int):
     db_card = db.query(Card).filter(Card.id == card_id).first()
-    if db_card:
-        db.delete(db_card)
-        db.commit()
+    if not db_card:
+        raise DoesNotExistError("Card not found")
+    db.delete(db_card)
+    db.commit()
     return db_card
